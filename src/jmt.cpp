@@ -15,7 +15,9 @@ std::vector<double> JMT::get_jmt(const VehicleState& start,
   const double t4 = t * t3;
   const double t5 = t * t4;
 
-  A << t3, t4, t5, 3 * t2, 4 * t3, 5 * t4, 6 * t, 12 * t2, 20 * t3;
+  A << t3, t4, t5,
+       3 * t2, 4 * t3, 5 * t4,
+       6 * t, 12 * t2, 20 * t3;
 
   b << end.p - (start.p + start.v * t + 0.5 * start.a * t2),
        end.v - (start.v + start.a * t),
