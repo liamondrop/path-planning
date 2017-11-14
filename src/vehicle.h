@@ -34,7 +34,6 @@ class Vehicle {
 
   Vehicle(const double s, const double d, const double v);
   void update_states(const VehicleState& state_s, const VehicleState& state_d);
-  void set_next_state(const Behavior bevaior);
   void realize_behavior(const Behavior behavior);
   std::vector<double> get_s_trajectory();
   std::vector<double> get_d_trajectory();
