@@ -11,48 +11,45 @@ Behavior BehaviorPlanner::update(Vehicle& my_vehicle, const std::vector<Vehicle>
 
   const double straight_cost = get_cost(my_vehicle.front_gap);
 
-  const double frontleft =
+  const double forward_left_space =
       get_gap(my_vehicle, other_vehicles, my_vehicle.lane_at_left, FROM_FRONT);
-  const double backleft =
+  const double rear_left_space =
       get_gap(my_vehicle, other_vehicles, my_vehicle.lane_at_left, FROM_BACK);
 
-  const double frontright =
+  const double forward_right_space =
       get_gap(my_vehicle, other_vehicles, my_vehicle.lane_at_right, FROM_FRONT);
-  const double backright =
+  const double rear_right_space =
       get_gap(my_vehicle, other_vehicles, my_vehicle.lane_at_right, FROM_BACK);
 
-  const double left_cost =
-      get_cost(frontleft, backleft, my_vehicle.lane_at_left);
-  const double right_cost =
-      get_cost(frontright, backright, my_vehicle.lane_at_right);
+  const double left_turn_cost =
+      get_cost(forward_left_space, rear_left_space, my_vehicle.lane_at_left);
+  const double right_turn_cost =
+      get_cost(forward_right_space, rear_right_space, my_vehicle.lane_at_right);
 
   std::cout << "---------------------------------" << std::endl;
-  std::cout << "FRONT LEFT GAP:  " << frontleft << std::endl;
-  std::cout << "FRONT GAP:       " << my_vehicle.front_gap << std::endl;
-  std::cout << "FRONT RIGHT GAP: " << frontright << std::endl;
+  std::cout << "FORWARD LEFT SPACE:  " << forward_left_space << std::endl;
+  std::cout << "FORWARD SPACE:       " << my_vehicle.front_gap << std::endl;
+  std::cout << "FORWARD RIGHT SPACE: " << forward_right_space << std::endl;
   std::cout << "---------------------------------" << std::endl;
-  std::cout << "REAR LEFT GAP:   " << backleft << std::endl;
-  std::cout << "REAR RIGHT GAP:  " << backright << std::endl;
+  std::cout << "REAR LEFT SPACE:     " << rear_left_space << std::endl;
+  std::cout << "REAR RIGHT SPACE:    " << rear_right_space << std::endl;
   std::cout << "---------------------------------" << std::endl;
-  std::cout << "LEFT COST:       " << left_cost << std::endl;
-  std::cout << "STRAIGHT COST:   " << straight_cost << std::endl;
-  std::cout << "RIGHT COST:      " << straight_cost << std::endl;
+  std::cout << "LEFT TURN COST:      " << left_turn_cost << std::endl;
+  std::cout << "STRAIGHT COST:       " << straight_cost << std::endl;
+  std::cout << "RIGHT TURN COST:     " << right_turn_cost << std::endl;
   std::cout << "---------------------------------" << std::endl;
 
-  if (left_cost < straight_cost && left_cost < right_cost) {
+  if (left_turn_cost < straight_cost && left_turn_cost < right_turn_cost) {
     std::cout << "==> DECISION: TURN LEFT." << std::endl;
-
     return Behavior::TURN_LEFT;
   }
 
-  if (right_cost < straight_cost && right_cost < left_cost) {
+  if (right_turn_cost < straight_cost && right_turn_cost < left_turn_cost) {
     std::cout << "==> DECISION: TURN RIGHT." << std::endl;
-
     return Behavior::TURN_RIGHT;
   }
 
   std::cout << "==> DECISION: KEEP LANE." << std::endl;
-
   return Behavior::KEEP_LANE;
 }
 
@@ -83,7 +80,6 @@ double BehaviorPlanner::get_cost(const double front_gap, const double back_gap,
 double BehaviorPlanner::get_cost(const double gap) const {
   if (gap < FRONT_GAP_THRESH) {
     std::cout << "... WARNING: Too near the front vehicle!" << std::endl;
-    std::cout << "We must turn! gap: " << gap << std::endl;
 
     return REALLY_BIG_NUMBER;
   }
@@ -93,7 +89,8 @@ double BehaviorPlanner::get_cost(const double gap) const {
 
 double BehaviorPlanner::get_gap(const Vehicle& my_vehicle,
                                 const std::vector<Vehicle>& other_vehicles,
-                                const Lane lane, const double where) {
+                                const Lane lane,
+                                const double direction) {
   if (lane == Lane::NONE || lane == Lane::UNSPECIFIED) {
     return 0.0001;
   }
@@ -101,7 +98,7 @@ double BehaviorPlanner::get_gap(const Vehicle& my_vehicle,
   double smallest_gap = REALLY_BIG_NUMBER;
 
   for (auto& other_vehicle : other_vehicles) {
-    double gap = (other_vehicle.s - my_vehicle.s) * where;
+    double gap = direction * (other_vehicle.s - my_vehicle.s);
 
     if (other_vehicle.current_lane == lane && gap > 0.0 && gap < smallest_gap) {
       smallest_gap = gap;

@@ -12,16 +12,20 @@ class BehaviorPlanner {
   BehaviorPlanner();
   Behavior update(Vehicle& my_vehicle,
                   const std::vector<Vehicle>& other_vehicles);
+
   double get_gap(const Vehicle& my_vehicle,
                  const std::vector<Vehicle>& other_vehicles,
-                 const Lane lane_type, const double where);
+                 const Lane lane,
+                 const double direction);
 
  private:
   double current_front_v;
   double current_front_s;
 
-  double get_cost(const double front_gap, const double back_gap,
+  double get_cost(const double front_gap,
+                  const double back_gap,
                   const Lane lane) const;
+
   double get_cost(const double gap) const;
 };
 
