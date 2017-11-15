@@ -10,7 +10,8 @@
 class BehaviorPlanner {
  public:
   BehaviorPlanner();
-  Behavior update(Vehicle& my_vehicle, std::vector<Vehicle>& other_vehicles);
+  Behavior update(Vehicle& my_vehicle,
+                  const std::vector<Vehicle>& other_vehicles);
   double get_gap(const Vehicle& my_vehicle,
                  const std::vector<Vehicle>& other_vehicles,
                  const Lane lane_type, const double where);

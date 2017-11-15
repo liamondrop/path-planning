@@ -42,7 +42,7 @@ void Vehicle::update_states(const VehicleState& state_s,
 
 void Vehicle::realize_behavior(const Behavior behavior) {
   // get target states based on behavior s component
-  double target_s = saved_state_s.p + TRAVERSE_TIME * saved_state_s.v;
+  double target_s = saved_state_s.p + TIME_HORIZON * saved_state_s.v;
   double target_v = saved_state_s.v;
 
   if (behavior == Behavior::KEEP_LANE) {
@@ -54,15 +54,15 @@ void Vehicle::realize_behavior(const Behavior behavior) {
 
     // Estimate a safe target distance based on our selected speed
     target_s =
-        saved_state_s.p + TRAVERSE_TIME * 0.5 * (saved_state_s.v + target_v);
+        saved_state_s.p + TIME_HORIZON * 0.5 * (saved_state_s.v + target_v);
   }
 
   VehicleState target_state_s = {target_s, target_v, 0.0};
   VehicleState target_state_d = {get_target_d(behavior), 0.0, 0.0};
 
   // generate JMTs
-  s_trajectory = JMT::get_jmt(saved_state_s, target_state_s, TRAVERSE_TIME);
-  d_trajectory = JMT::get_jmt(saved_state_d, target_state_d, TRAVERSE_TIME);
+  s_trajectory = JMT::get_jmt(saved_state_s, target_state_s, TIME_HORIZON);
+  d_trajectory = JMT::get_jmt(saved_state_d, target_state_d, TIME_HORIZON);
 
   // save target states
   update_states(target_state_s, target_state_d);
