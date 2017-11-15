@@ -3,28 +3,29 @@
 
 BehaviorPlanner::BehaviorPlanner() {}
 
-Behavior BehaviorPlanner::update(Vehicle& my_vehicle, const std::vector<Vehicle>& other_vehicles) {
-  my_vehicle.front_gap =
-      get_gap(my_vehicle, other_vehicles, my_vehicle.current_lane, FROM_FRONT);
+Behavior BehaviorPlanner::update(Vehicle& my_vehicle,
+                                 const std::vector<Vehicle>& other_vehicles) {
+  my_vehicle.front_gap = get_gap(my_vehicle, other_vehicles,
+                                 my_vehicle.current_lane, DIRECTION_FORWARD);
   my_vehicle.front_v = current_front_v;
   my_vehicle.front_s = current_front_s;
 
-  const double straight_cost = get_cost(my_vehicle.front_gap);
+  const double straight_cost = get_forward_cost(my_vehicle.front_gap);
 
-  const double forward_left_space =
-      get_gap(my_vehicle, other_vehicles, my_vehicle.lane_at_left, FROM_FRONT);
-  const double rear_left_space =
-      get_gap(my_vehicle, other_vehicles, my_vehicle.lane_at_left, FROM_BACK);
+  const double forward_left_space = get_gap(
+      my_vehicle, other_vehicles, my_vehicle.lane_at_left, DIRECTION_FORWARD);
+  const double rear_left_space = get_gap(
+      my_vehicle, other_vehicles, my_vehicle.lane_at_left, DIRECTION_REAR);
 
-  const double forward_right_space =
-      get_gap(my_vehicle, other_vehicles, my_vehicle.lane_at_right, FROM_FRONT);
-  const double rear_right_space =
-      get_gap(my_vehicle, other_vehicles, my_vehicle.lane_at_right, FROM_BACK);
+  const double forward_right_space = get_gap(
+      my_vehicle, other_vehicles, my_vehicle.lane_at_right, DIRECTION_FORWARD);
+  const double rear_right_space = get_gap(
+      my_vehicle, other_vehicles, my_vehicle.lane_at_right, DIRECTION_REAR);
 
-  const double left_turn_cost =
-      get_cost(forward_left_space, rear_left_space, my_vehicle.lane_at_left);
-  const double right_turn_cost =
-      get_cost(forward_right_space, rear_right_space, my_vehicle.lane_at_right);
+  const double left_turn_cost = get_lane_change_cost(
+      forward_left_space, rear_left_space, my_vehicle.lane_at_left);
+  const double right_turn_cost = get_lane_change_cost(
+      forward_right_space, rear_right_space, my_vehicle.lane_at_right);
 
   std::cout << "---------------------------------" << std::endl;
   std::cout << "FORWARD LEFT SPACE:  " << forward_left_space << std::endl;
@@ -53,49 +54,50 @@ Behavior BehaviorPlanner::update(Vehicle& my_vehicle, const std::vector<Vehicle>
   return Behavior::KEEP_LANE;
 }
 
-double BehaviorPlanner::get_cost(const double front_gap, const double back_gap,
-                                 const Lane lane) const {
-  double cost = (FRONT_GAP_FACTOR / front_gap + BACK_GAP_FACTOR / back_gap);
-
-  if (lane == Lane::NONE || lane == Lane::UNSPECIFIED) {
-    return REALLY_BIG_NUMBER;
+double BehaviorPlanner::get_lane_change_cost(const double forward_gap,
+                                             const double rear_gap,
+                                             const Lane lane) {
+  if (lane == Lane::OUT_OF_BOUNDS) {
+    return LARGE_VALUE;
   }
 
-  if (front_gap < FRONT_GAP_THRESH || back_gap < BACK_GAP_THRESH) {
+  if (forward_gap < FORWARD_GAP_THRESHOLD || rear_gap < REAR_GAP_THRESHOLD) {
     std::cout << "... Insufficient space to turn!" << std::endl;
-
-    return REALLY_BIG_NUMBER;
+    return LARGE_VALUE;
   }
 
-  // We don't want to turn at every opportunity back and forth
-  cost = cost * TURN_PENALTY_FACTOR;
+  // A lane change should come with some inherent cost
+  double cost = CHANGE_LANE_WEIGHT;
 
+  // Apply weights to the amount of space in the adjacent lane
+  cost *= (FORWARD_GAP_WEIGHT / forward_gap + REAR_GAP_WEIGHT / rear_gap);
+
+  // All else being equal, prefer the middle lane
   if (lane == Lane::MID) {
-    cost = cost * MIDLANE_REWARD_FACTOR;
+    cost *= PREFER_MID_LANE_WEIGHT;
   }
 
   return cost;
 }
 
-double BehaviorPlanner::get_cost(const double gap) const {
-  if (gap < FRONT_GAP_THRESH) {
+double BehaviorPlanner::get_forward_cost(const double gap) {
+  if (gap < FORWARD_GAP_THRESHOLD) {
     std::cout << "... WARNING: Too near the front vehicle!" << std::endl;
 
-    return REALLY_BIG_NUMBER;
+    return LARGE_VALUE;
   }
 
-  return FRONT_GAP_FACTOR / gap;
+  return FORWARD_GAP_WEIGHT / gap;
 }
 
 double BehaviorPlanner::get_gap(const Vehicle& my_vehicle,
                                 const std::vector<Vehicle>& other_vehicles,
-                                const Lane lane,
-                                const double direction) {
-  if (lane == Lane::NONE || lane == Lane::UNSPECIFIED) {
-    return 0.0001;
+                                const Lane lane, const double direction) {
+  if (lane == Lane::OUT_OF_BOUNDS) {
+    return 0.0;
   }
 
-  double smallest_gap = REALLY_BIG_NUMBER;
+  double smallest_gap = LARGE_VALUE;
 
   for (auto& other_vehicle : other_vehicles) {
     double gap = direction * (other_vehicle.s - my_vehicle.s);

@@ -3,9 +3,9 @@
 
 #include "./jmt.h"
 
-const double LEFT_d = 2.0;
+const double LEFT_d = 2.1;
 const double MID_d = 6.0;
-const double RIGHT_d = 10.0;
+const double RIGHT_d = 9.9;
 
 Vehicle::Vehicle(const double s, const double d, const double v)
     : s(s), d(d), v(v) {
@@ -16,7 +16,7 @@ Vehicle::Vehicle(const double s, const double d, const double v)
 void Vehicle::update_adjacent_lanes() {
   switch (current_lane) {
     case Lane::LEFT:
-      lane_at_left = Lane::NONE;
+      lane_at_left = Lane::OUT_OF_BOUNDS;
       lane_at_right = Lane::MID;
       break;
     case Lane::MID:
@@ -25,11 +25,11 @@ void Vehicle::update_adjacent_lanes() {
       break;
     case Lane::RIGHT:
       lane_at_left = Lane::MID;
-      lane_at_right = Lane::NONE;
+      lane_at_right = Lane::OUT_OF_BOUNDS;
       break;
     default:
-      lane_at_left = Lane::UNSPECIFIED;
-      lane_at_right = Lane::UNSPECIFIED;
+      lane_at_left = Lane::OUT_OF_BOUNDS;
+      lane_at_right = Lane::OUT_OF_BOUNDS;
   }
 }
 
@@ -49,7 +49,7 @@ void Vehicle::realize_behavior(const Behavior behavior) {
     if (front_gap > FRONT_BUFFER) {
       target_v = SPEED_LIMIT;
     } else {
-      target_v = fmax(MIN_SPEED, fmin(SPEED_LIMIT, front_v - SPEED_BUFFER));
+      target_v = fmax(MINIMUM_SPEED, fmin(SPEED_LIMIT, front_v - SPEED_BUFFER));
     }
 
     // Estimate a safe target distance based on our selected speed
@@ -76,7 +76,7 @@ Lane Vehicle::convert_d_to_lane(const double d) {
   if (d >= 0.0 && d < 4.0) return Lane::LEFT;
   if (d >= 4.0 && d < 8.0) return Lane::MID;
   if (d >= 8.0 && d < 12.0) return Lane::RIGHT;
-  return Lane::NONE;
+  return Lane::OUT_OF_BOUNDS;
 }
 
 double Vehicle::convert_lane_to_d(const Lane lane_to_convert) {
