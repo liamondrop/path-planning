@@ -9,6 +9,7 @@ const double TIME_HORIZON = 2.0;
 const int TIME_STEPS = static_cast<int>(TIME_HORIZON / TIME_INCREMENT);
 
 const int PATH_SIZE_CUTOFF = 10;
+const int PREVIOUS_PATH_POINTS_TO_KEEP = 25;
 
 // used as parameter in BehaviorPlanner::get_gap()
 const double DIRECTION_FORWARD = 1.0;
@@ -33,7 +34,7 @@ const double SPEED_BUFFER = 1.0;
 const double PREFER_MID_LANE_WEIGHT = 0.25;
 const double REAR_GAP_WEIGHT = 0.5;
 const double FORWARD_GAP_WEIGHT = 1.0;
-const double CHANGE_LANE_WEIGHT = 1.4;
+const double LANE_CHANGE_WEIGHT = 1.4;
 
 typedef enum { LEFT, MID, RIGHT, OUT_OF_BOUNDS } Lane;
 typedef enum { KEEP_LANE, TURN_RIGHT, TURN_LEFT } Behavior;

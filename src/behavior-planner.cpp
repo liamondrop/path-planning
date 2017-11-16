@@ -41,16 +41,16 @@ Behavior BehaviorPlanner::update(Vehicle& my_vehicle,
   std::cout << "---------------------------------" << std::endl;
 
   if (left_turn_cost < straight_cost && left_turn_cost < right_turn_cost) {
-    std::cout << "==> DECISION: TURN LEFT." << std::endl;
+    std::cout << "==> DECISION: TURN LEFT" << std::endl;
     return Behavior::TURN_LEFT;
   }
 
   if (right_turn_cost < straight_cost && right_turn_cost < left_turn_cost) {
-    std::cout << "==> DECISION: TURN RIGHT." << std::endl;
+    std::cout << "==> DECISION: TURN RIGHT" << std::endl;
     return Behavior::TURN_RIGHT;
   }
 
-  std::cout << "==> DECISION: KEEP LANE." << std::endl;
+  std::cout << "==> DECISION: KEEP LANE" << std::endl;
   return Behavior::KEEP_LANE;
 }
 
@@ -67,7 +67,7 @@ double BehaviorPlanner::get_lane_change_cost(const double forward_gap,
   }
 
   // A lane change should come with some inherent cost
-  double cost = CHANGE_LANE_WEIGHT;
+  double cost = LANE_CHANGE_WEIGHT;
 
   // Apply weights to the amount of space in the adjacent lane
   cost *= (FORWARD_GAP_WEIGHT / forward_gap + REAR_GAP_WEIGHT / rear_gap);
