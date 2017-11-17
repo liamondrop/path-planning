@@ -43,7 +43,7 @@ MapWaypoints::MapWaypoints(std::string file_path) {
   }
 
   X.push_back(X[0]);
-  Y.push_back(X[0]);
+  Y.push_back(Y[0]);
   S.push_back(TRACK_LENGTH);
   dX.push_back(dX[0]);
   dY.push_back(dY[0]);
