@@ -13,7 +13,7 @@ class BehaviorPlanner {
                         const std::vector<Vehicle>& other_vehicles,
                         const Lane lane, const double direction);
 
-  static double get_forward_cost(const double gap);
+  static double get_keep_lane_cost(const double gap);
 
   static double get_lane_change_cost(const double forward_gap,
                                      const double rear_gap,
@@ -21,7 +21,7 @@ class BehaviorPlanner {
 
  public:
   static Behavior update(const Vehicle& my_vehicle,
-                         const Vehicle& forward_vehicle,
+                         const double forward_gap,
                          const std::vector<Vehicle>& other_vehicles);
 };
 

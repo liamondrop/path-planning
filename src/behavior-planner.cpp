@@ -2,13 +2,9 @@
 #include <vector>
 
 Behavior BehaviorPlanner::update(const Vehicle& my_vehicle,
-                                 const Vehicle& forward_vehicle,
+                                 const double forward_gap,
                                  const std::vector<Vehicle>& other_vehicles) {
-  double forward_gap = forward_vehicle.s - my_vehicle.s;
-  if (forward_gap < 0) {
-    forward_gap = LARGE_VALUE;
-  }
-  const double straight_cost = get_forward_cost(forward_gap);
+  const double straight_cost = get_keep_lane_cost(forward_gap);
 
   const double forward_left_space = get_gap(
       my_vehicle, other_vehicles, my_vehicle.lane_at_left, DIRECTION_FORWARD);
@@ -78,7 +74,7 @@ double BehaviorPlanner::get_lane_change_cost(const double forward_gap,
   return cost;
 }
 
-double BehaviorPlanner::get_forward_cost(const double gap) {
+double BehaviorPlanner::get_keep_lane_cost(const double gap) {
   if (gap < FORWARD_GAP_THRESHOLD) {
     std::cout << "... WARNING: Too near the front vehicle!" << std::endl;
     return LARGE_VALUE;
