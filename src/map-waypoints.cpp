@@ -44,7 +44,7 @@ MapWaypoints::MapWaypoints(std::string file_path) {
 
   X.push_back(X[0]);
   Y.push_back(X[0]);
-  S.push_back(TRACK_DISTANCE);
+  S.push_back(TRACK_LENGTH);
   dX.push_back(dX[0]);
   dY.push_back(dY[0]);
 
@@ -57,7 +57,7 @@ MapWaypoints::MapWaypoints(std::string file_path) {
 
 std::vector<double> MapWaypoints::convert_frenet_to_cartesian(
     const double s, const double d) const {
-  const double mod_s = fmod(s, TRACK_DISTANCE);
+  const double mod_s = fmod(s, TRACK_LENGTH);
   const double dx = dx_spline(mod_s);
   const double dy = dy_spline(mod_s);
 

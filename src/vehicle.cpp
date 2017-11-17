@@ -7,8 +7,6 @@ const double LEFT_d = 2.2;
 const double MID_d = 6.0;
 const double RIGHT_d = 9.8;
 
-Vehicle::Vehicle() {}
-
 Vehicle::Vehicle(const double s, const double d, const double v)
     : s(s), d(d), v(v) {
   current_lane = convert_d_to_lane(d);
@@ -20,7 +18,7 @@ Vehicle::~Vehicle() {}
 void Vehicle::update_states(const VehicleState& new_state_s,
                             const VehicleState& new_state_d) {
   state_s = new_state_s;
-  state_s.p = fmod(state_s.p, TRACK_DISTANCE);
+  state_s.p = fmod(state_s.p, TRACK_LENGTH);
   state_d = new_state_d;
 }
 
@@ -54,10 +52,6 @@ void Vehicle::realize_behavior(const Behavior& behavior,
   // save target states
   update_states(target_state_s, target_state_d);
 }
-
-std::vector<double> Vehicle::get_s_trajectory() { return s_trajectory; }
-
-std::vector<double> Vehicle::get_d_trajectory() { return d_trajectory; }
 
 Lane Vehicle::convert_d_to_lane(const double d) {
   if (d >= 0.0 && d < 4.0) return Lane::LEFT;

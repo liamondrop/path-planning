@@ -35,7 +35,6 @@ class Vehicle {
   Lane lane_at_right;
   Lane lane_at_left;
 
-  Vehicle();
   Vehicle(const double s, const double d, const double v);
   virtual ~Vehicle();
 
@@ -46,8 +45,8 @@ class Vehicle {
                         const Vehicle& forward_vehicle,
                         const double time_horizon);
 
-  std::vector<double> get_s_trajectory();
-  std::vector<double> get_d_trajectory();
+  std::vector<double> get_s_trajectory() { return s_trajectory; }
+  std::vector<double> get_d_trajectory() { return d_trajectory; }
 };
 
 #endif  // SRC_VEHICLE_H_
