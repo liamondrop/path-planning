@@ -99,7 +99,7 @@ double BehaviorPlanner::get_gap(const Vehicle& my_vehicle,
 
   double smallest_gap = LARGE_VALUE;
 
-  for (auto& other_vehicle : other_vehicles) {
+  for (Vehicle other_vehicle : other_vehicles) {
     double gap = direction * (other_vehicle.s - my_vehicle.s);
 
     if (other_vehicle.current_lane == lane && gap > 0.0 && gap < smallest_gap) {

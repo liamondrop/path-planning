@@ -3,9 +3,9 @@
 
 #include "./jmt.h"
 
-const double LEFT_d = 2.1;
+const double LEFT_d = 2.2;
 const double MID_d = 6.0;
-const double RIGHT_d = 9.9;
+const double RIGHT_d = 9.8;
 
 Vehicle::Vehicle(const double s, const double d, const double v)
     : s(s), d(d), v(v) {

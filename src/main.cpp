@@ -35,8 +35,8 @@ std::string hasData(std::string s) {
 
 MapPath generate_initial_path(Vehicle &my_vehicle,
                               const MapWaypoints &map_waypoints) {
-  const int n = 225;
-  const double t = n * TIME_INCREMENT;
+  const int steps = 2 * TIME_STEPS;
+  const double t = steps * TIME_INCREMENT;
   const double target_speed = 20.0;
   const double target_s = my_vehicle.s + 40.0;
 
@@ -51,16 +51,16 @@ MapPath generate_initial_path(Vehicle &my_vehicle,
 
   my_vehicle.update_states(end_state_s, end_state_d);
 
-  return map_waypoints.make_path(jmt_s, jmt_d, TIME_INCREMENT, n);
+  return map_waypoints.make_path(jmt_s, jmt_d, TIME_INCREMENT, 0, steps);
 }
 
 int main() {
   uWS::Hub h;
 
   bool is_initial_frame = true;
-  std::cout << "Loading map..." << std::endl;
+  std::cout << "Loading map waypoints..." << std::endl;
   MapWaypoints map_waypoints("../data/highway_map.csv");
-  std::cout << "Map loaded..." << std::endl;
+  std::cout << "Map waypoints loaded..." << std::endl;
 
   h.onMessage([&map_waypoints, &is_initial_frame](
                   uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
@@ -107,12 +107,13 @@ int main() {
 
           // Our default is to just give back our previous plan
           int path_size = previous_path_x.size();
+
           MapPath planned_path = {previous_path_x, previous_path_y};
 
           if (is_initial_frame) {
             planned_path = generate_initial_path(my_vehicle, map_waypoints);
             is_initial_frame = false;
-          } else if (path_size < PATH_SIZE_CUTOFF) {
+          } else if (path_size < PATH_SIZE_THRESHOLD) {
             // Our previous plan is about to run out, so append to it
             // Make a list of all relevant information about other cars
             std::vector<Vehicle> other_vehicles;
@@ -129,12 +130,11 @@ int main() {
               other_vehicles.push_back(other_vehicle);
             }
 
-            std::cout << "---------------------------------" << std::endl;
+            std::cout << "=================================" << std::endl;
             std::cout << "CAR_S: " << car_s << std::endl;
             std::cout << "CAR_D: " << car_d << std::endl;
             std::cout << "CAR_X: " << car_x << std::endl;
             std::cout << "CAR_Y: " << car_y << std::endl;
-            std::cout << "CAR SPEED: " << car_speed << std::endl;
             std::cout << "---------------------------------" << std::endl;
 
             BehaviorPlanner planner;
@@ -149,7 +149,7 @@ int main() {
             // the simulator can understand
             MapPath next_path = map_waypoints.make_path(
                 my_vehicle.get_s_trajectory(), my_vehicle.get_d_trajectory(),
-                TIME_INCREMENT, TIME_STEPS);
+                TIME_INCREMENT, 0, TIME_STEPS);
 
             // Append these generated points to the old points
             planned_path.X.insert(planned_path.X.end(), next_path.X.begin(),
