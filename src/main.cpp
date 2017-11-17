@@ -116,19 +116,23 @@ int main() {
           } else if (path_size < PATH_SIZE_THRESHOLD) {
             std::vector<Vehicle> other_vehicles;
 
-            Vehicle forward_vehicle;
+            // inititate a placeholder for the nearest
+            // forward vehicle.
+            Vehicle forward_vehicle(0, -1, 0);
             double smallest_gap = LARGE_VALUE;
-            for (auto detected_car : sensor_fusion) {
-              const int id = detected_car[0];
-              const double vx = detected_car[3];
-              const double vy = detected_car[4];
-              const double s = detected_car[5];
-              const double d = detected_car[6];
+
+            for (auto detected_vehicle : sensor_fusion) {
+              const int id = detected_vehicle[0];
+              const double vx = detected_vehicle[3];
+              const double vy = detected_vehicle[4];
+              const double s = detected_vehicle[5];
+              const double d = detected_vehicle[6];
               const double velocity = sqrt(vx * vx + vy * vy);
 
               Vehicle other_vehicle(s, d, velocity);
 
-              const double gap = (other_vehicle.s - my_vehicle.s);
+              // find the nearest vehicle in the current lane
+              const double gap = s - car_s;
               if (other_vehicle.current_lane == my_vehicle.current_lane &&
                   gap > 0.0 && gap < smallest_gap) {
                 smallest_gap = gap;
@@ -145,8 +149,11 @@ int main() {
             std::cout << "CAR_Y: " << car_y << std::endl;
             std::cout << "---------------------------------" << std::endl;
 
-            Behavior behavior = BehaviorPlanner::update(
-                my_vehicle, forward_vehicle, other_vehicles);
+            double forward_gap = forward_vehicle.s - my_vehicle.s;
+            if (forward_gap < 0) forward_gap = LARGE_VALUE;
+
+            Behavior behavior = BehaviorPlanner::update(my_vehicle, forward_gap,
+                                                        other_vehicles);
 
             int n_steps = TIME_STEPS - path_size;
             double time_horizon = n_steps * TIME_INCREMENT;
