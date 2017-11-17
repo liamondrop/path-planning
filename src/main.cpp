@@ -114,10 +114,10 @@ int main() {
             planned_path = generate_initial_path(my_vehicle, map_waypoints);
             is_initial_frame = false;
           } else if (path_size < PATH_SIZE_THRESHOLD) {
-            // Our previous plan is about to run out, so append to it
-            // Make a list of all relevant information about other cars
             std::vector<Vehicle> other_vehicles;
 
+            Vehicle forward_vehicle;
+            double smallest_gap = LARGE_VALUE;
             for (auto detected_car : sensor_fusion) {
               const int id = detected_car[0];
               const double vx = detected_car[3];
@@ -127,6 +127,14 @@ int main() {
               const double velocity = sqrt(vx * vx + vy * vy);
 
               Vehicle other_vehicle(s, d, velocity);
+
+              const double gap = (other_vehicle.s - my_vehicle.s);
+              if (other_vehicle.current_lane == my_vehicle.current_lane &&
+                  gap > 0.0 && gap < smallest_gap) {
+                smallest_gap = gap;
+                forward_vehicle = other_vehicle;
+              }
+
               other_vehicles.push_back(other_vehicle);
             }
 
@@ -137,21 +145,18 @@ int main() {
             std::cout << "CAR_Y: " << car_y << std::endl;
             std::cout << "---------------------------------" << std::endl;
 
-            BehaviorPlanner planner;
-            Behavior behavior = planner.update(my_vehicle, other_vehicles);
+            Behavior behavior = BehaviorPlanner::update(
+                my_vehicle, forward_vehicle, other_vehicles);
 
-            // Update saved state of our car (THIS IS IMPORTANT) with the latest
-            // generated target states, this is to be used as the starting state
-            // when generating a trajectory next time
-            my_vehicle.realize_behavior(behavior);
+            int n_steps = TIME_STEPS - path_size;
+            double time_horizon = n_steps * TIME_INCREMENT;
+            my_vehicle.realize_behavior(behavior, forward_vehicle,
+                                        time_horizon);
 
-            // convert this trajectory in the s-d frame to to discrete XY points
-            // the simulator can understand
             MapPath next_path = map_waypoints.make_path(
                 my_vehicle.get_s_trajectory(), my_vehicle.get_d_trajectory(),
-                TIME_INCREMENT, 0, TIME_STEPS);
+                TIME_INCREMENT, 0, n_steps);
 
-            // Append these generated points to the old points
             planned_path.X.insert(planned_path.X.end(), next_path.X.begin(),
                                   next_path.X.end());
             planned_path.Y.insert(planned_path.Y.end(), next_path.Y.begin(),

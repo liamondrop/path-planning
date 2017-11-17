@@ -5,13 +5,13 @@ const double LARGE_VALUE = 2e+32;
 
 // The length of the path to send to the controller
 const double TIME_INCREMENT = 0.02;
-const double TIME_HORIZON = 2.0;
-const int TIME_STEPS = static_cast<int>(TIME_HORIZON / TIME_INCREMENT);
+const double PLANNING_HORIZON = 2.0;
+const int TIME_STEPS = static_cast<int>(PLANNING_HORIZON / TIME_INCREMENT);
 
-// The point at which update and extend the current planned trajectory
-const int PATH_SIZE_THRESHOLD = 50;
+// The point at which to update and extend the current planned trajectory
+const int PATH_SIZE_THRESHOLD = 10;
 
-// used as parameter in BehaviorPlanner::get_gap()
+// Used to determine whether to look for vehicles ahead or vehicles behind
 const double DIRECTION_FORWARD = 1.0;
 const double DIRECTION_REAR = -1.0;
 

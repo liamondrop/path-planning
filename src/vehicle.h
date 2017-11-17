@@ -17,6 +17,9 @@ struct VehicleState {
 
 class Vehicle {
  private:
+  VehicleState state_s;
+  VehicleState state_d;
+
   void update_adjacent_lanes();
   Lane convert_d_to_lane(const double d);
   double convert_lane_to_d(const Lane lane_to_convert);
@@ -28,21 +31,23 @@ class Vehicle {
   double s;
   double d;
   double v;
-  double front_gap;
-  double front_v;
-  double front_s;
-
-  Vehicle(const double s, const double d, const double v);
-  void update_states(const VehicleState& state_s, const VehicleState& state_d);
-  void realize_behavior(const Behavior behavior);
-  std::vector<double> get_s_trajectory();
-  std::vector<double> get_d_trajectory();
-
-  VehicleState saved_state_s;
-  VehicleState saved_state_d;
   Lane current_lane;
   Lane lane_at_right;
   Lane lane_at_left;
+
+  Vehicle();
+  Vehicle(const double s, const double d, const double v);
+  virtual ~Vehicle();
+
+  void update_states(const VehicleState& new_state_s,
+                     const VehicleState& new_state_d);
+
+  void realize_behavior(const Behavior& behavior,
+                        const Vehicle& forward_vehicle,
+                        const double time_horizon);
+
+  std::vector<double> get_s_trajectory();
+  std::vector<double> get_d_trajectory();
 };
 
 #endif  // SRC_VEHICLE_H_

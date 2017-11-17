@@ -7,10 +7,63 @@ const double LEFT_d = 2.2;
 const double MID_d = 6.0;
 const double RIGHT_d = 9.8;
 
+Vehicle::Vehicle() {}
+
 Vehicle::Vehicle(const double s, const double d, const double v)
     : s(s), d(d), v(v) {
   current_lane = convert_d_to_lane(d);
   update_adjacent_lanes();
+}
+
+Vehicle::~Vehicle() {}
+
+void Vehicle::update_states(const VehicleState& new_state_s,
+                            const VehicleState& new_state_d) {
+  state_s = new_state_s;
+  state_s.p = fmod(state_s.p, TRACK_DISTANCE);
+  state_d = new_state_d;
+}
+
+void Vehicle::realize_behavior(const Behavior& behavior,
+                               const Vehicle& forward_vehicle,
+                               const double time_horizon) {
+  // get target states based on behavior s component
+  double target_s = state_s.p + time_horizon * state_s.v;
+  double target_v = state_s.v;
+  const double forward_gap = (forward_vehicle.s - s);
+
+  if (behavior == Behavior::KEEP_LANE) {
+    if (0 > forward_gap || forward_gap > FRONT_BUFFER) {
+      target_v = SPEED_LIMIT;
+    } else {
+      target_v = fmin(SPEED_LIMIT, forward_vehicle.v - SPEED_BUFFER);
+      target_v = fmax(MINIMUM_SPEED, target_v);
+    }
+
+    // Estimate a safe target distance based on our selected speed
+    target_s = state_s.p + time_horizon * 0.5 * (state_s.v + target_v);
+  }
+
+  VehicleState target_state_s = {target_s, target_v, 0.0};
+  VehicleState target_state_d = {get_target_d(behavior), 0.0, 0.0};
+
+  // generate JMTs
+  s_trajectory = JMT::get_jmt(state_s, target_state_s, time_horizon);
+  d_trajectory = JMT::get_jmt(state_d, target_state_d, time_horizon);
+
+  // save target states
+  update_states(target_state_s, target_state_d);
+}
+
+std::vector<double> Vehicle::get_s_trajectory() { return s_trajectory; }
+
+std::vector<double> Vehicle::get_d_trajectory() { return d_trajectory; }
+
+Lane Vehicle::convert_d_to_lane(const double d) {
+  if (d >= 0.0 && d < 4.0) return Lane::LEFT;
+  if (d >= 4.0 && d < 8.0) return Lane::MID;
+  if (d >= 8.0 && d < 12.0) return Lane::RIGHT;
+  return Lane::OUT_OF_BOUNDS;
 }
 
 void Vehicle::update_adjacent_lanes() {
@@ -31,52 +84,6 @@ void Vehicle::update_adjacent_lanes() {
       lane_at_left = Lane::OUT_OF_BOUNDS;
       lane_at_right = Lane::OUT_OF_BOUNDS;
   }
-}
-
-void Vehicle::update_states(const VehicleState& state_s,
-                            const VehicleState& state_d) {
-  saved_state_s = state_s;
-  saved_state_s.p = fmod(saved_state_s.p, TRACK_DISTANCE);
-  saved_state_d = state_d;
-}
-
-void Vehicle::realize_behavior(const Behavior behavior) {
-  // get target states based on behavior s component
-  double target_s = saved_state_s.p + TIME_HORIZON * saved_state_s.v;
-  double target_v = saved_state_s.v;
-
-  if (behavior == Behavior::KEEP_LANE) {
-    if (front_gap > FRONT_BUFFER) {
-      target_v = SPEED_LIMIT;
-    } else {
-      target_v = fmax(MINIMUM_SPEED, fmin(SPEED_LIMIT, front_v - SPEED_BUFFER));
-    }
-
-    // Estimate a safe target distance based on our selected speed
-    target_s =
-        saved_state_s.p + TIME_HORIZON * 0.5 * (saved_state_s.v + target_v);
-  }
-
-  VehicleState target_state_s = {target_s, target_v, 0.0};
-  VehicleState target_state_d = {get_target_d(behavior), 0.0, 0.0};
-
-  // generate JMTs
-  s_trajectory = JMT::get_jmt(saved_state_s, target_state_s, TIME_HORIZON);
-  d_trajectory = JMT::get_jmt(saved_state_d, target_state_d, TIME_HORIZON);
-
-  // save target states
-  update_states(target_state_s, target_state_d);
-}
-
-std::vector<double> Vehicle::get_s_trajectory() { return s_trajectory; }
-
-std::vector<double> Vehicle::get_d_trajectory() { return d_trajectory; }
-
-Lane Vehicle::convert_d_to_lane(const double d) {
-  if (d >= 0.0 && d < 4.0) return Lane::LEFT;
-  if (d >= 4.0 && d < 8.0) return Lane::MID;
-  if (d >= 8.0 && d < 12.0) return Lane::RIGHT;
-  return Lane::OUT_OF_BOUNDS;
 }
 
 double Vehicle::convert_lane_to_d(const Lane lane_to_convert) {
