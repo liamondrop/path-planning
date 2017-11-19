@@ -13,8 +13,6 @@ Vehicle::Vehicle(const double s, const double d, const double v)
   update_adjacent_lanes();
 }
 
-Vehicle::~Vehicle() {}
-
 void Vehicle::update_states(const VehicleState& new_state_s,
                             const VehicleState& new_state_d) {
   state_s = new_state_s;

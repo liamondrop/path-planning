@@ -36,7 +36,7 @@ class Vehicle {
   Lane lane_at_left;
 
   Vehicle(const double s, const double d, const double v);
-  virtual ~Vehicle();
+  virtual ~Vehicle() {}
 
   void update_states(const VehicleState& new_state_s,
                      const VehicleState& new_state_d);
