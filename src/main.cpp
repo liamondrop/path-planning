@@ -149,20 +149,18 @@ int main() {
             BehaviorPlanner planner(my_vehicle, other_vehicles);
             Behavior behavior = planner.get_behavior(forward_gap);
 
-            int n_steps = TIME_STEPS - path_size;
-            double time_horizon = n_steps * TIME_INCREMENT;
+            const int n_steps = TIME_STEPS - path_size;
+            const double time_horizon = n_steps * TIME_INCREMENT;
             my_vehicle.realize_behavior(behavior, forward_vehicle, time_horizon);
 
-            MapPath next_path = map_waypoints.generate_path(
+            const MapPath next_path = map_waypoints.generate_path(
                 my_vehicle.get_s_trajectory(),
                 my_vehicle.get_d_trajectory(),
                 TIME_INCREMENT, 0, n_steps);
 
-            planned_path.X.insert(planned_path.X.end(),
-                                  next_path.X.begin(),
+            planned_path.X.insert(planned_path.X.end(), next_path.X.begin(),
                                   next_path.X.end());
-            planned_path.Y.insert(planned_path.Y.end(),
-                                  next_path.Y.begin(),
+            planned_path.Y.insert(planned_path.Y.end(), next_path.Y.begin(),
                                   next_path.Y.end());
           }
 
