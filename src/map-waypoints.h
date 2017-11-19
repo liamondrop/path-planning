@@ -17,6 +17,11 @@ struct MapPath {
   std::vector<double> Y;
 };
 
+struct Point {
+  double x;
+  double y;
+};
+
 class MapWaypoints {
  private:
   double distance;
@@ -28,14 +33,12 @@ class MapWaypoints {
  public:
   MapWaypoints(std::string file_path);
 
-  std::vector<double> convert_frenet_to_cartesian(const double s,
-                                                  const double d) const;
+  Point convert_frenet_to_cartesian(const double s, const double d) const;
 
-  MapPath make_path(std::vector<double> jmt_s,
-                    std::vector<double> jmt_d,
-                    const double t,
-                    const int start_index,
-                    const int end_index) const;
+  MapPath generate_path(std::vector<double> s_trajectory,
+                        std::vector<double> d_trajectory,
+                        const double time_increment, const int start_index,
+                        const int end_index) const;
 };
 
 #endif  // SRC_PATH_CONVERTER_H_

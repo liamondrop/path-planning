@@ -5,15 +5,11 @@ const double LARGE_VALUE = 2e+32;
 
 // The length of the path to send to the controller
 const double TIME_INCREMENT = 0.02;
-const double PLANNING_HORIZON = 2.0;
+const double PLANNING_HORIZON = 2.5;
 const int TIME_STEPS = static_cast<int>(PLANNING_HORIZON / TIME_INCREMENT);
 
 // The point at which to update and extend the current planned trajectory
-const int PATH_SIZE_THRESHOLD = 10;
-
-// Used to determine whether to look for vehicles ahead or vehicles behind
-const double DIRECTION_FORWARD = 1.0;
-const double DIRECTION_REAR = -1.0;
+const int PATH_SIZE_THRESHOLD = 15;
 
 // Total road distance of the the highway loop
 const double TRACK_LENGTH = 6945.554;

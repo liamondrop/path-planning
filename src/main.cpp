@@ -51,7 +51,7 @@ MapPath generate_initial_path(Vehicle &my_vehicle,
 
   my_vehicle.update_states(end_state_s, end_state_d);
 
-  return map_waypoints.make_path(jmt_s, jmt_d, TIME_INCREMENT, 0, steps);
+  return map_waypoints.generate_path(jmt_s, jmt_d, TIME_INCREMENT, 0, steps);
 }
 
 int main() {
@@ -107,6 +107,7 @@ int main() {
 
           // Our default is to just give back our previous plan
           int path_size = previous_path_x.size();
+          int subpath_size = fmin(PATH_SIZE_THRESHOLD, path_size);
 
           MapPath planned_path = {previous_path_x, previous_path_y};
 
@@ -114,13 +115,19 @@ int main() {
             planned_path = generate_initial_path(my_vehicle, map_waypoints);
             is_initial_frame = false;
           } else if (path_size < PATH_SIZE_THRESHOLD) {
-            std::vector<Vehicle> other_vehicles;
+            std::cout << "=================================" << std::endl;
+            std::cout << "CAR_S: " << car_s << std::endl;
+            std::cout << "CAR_D: " << car_d << std::endl;
+            std::cout << "CAR_X: " << car_x << std::endl;
+            std::cout << "CAR_Y: " << car_y << std::endl;
 
             // inititate a placeholder for the nearest
             // forward vehicle.
             Vehicle forward_vehicle(0, -1, 0);
             double smallest_gap = LARGE_VALUE;
 
+            //
+            std::vector<Vehicle> other_vehicles;
             for (auto detected_vehicle : sensor_fusion) {
               const int id = detected_vehicle[0];
               const double vx = detected_vehicle[3];
@@ -142,25 +149,18 @@ int main() {
               other_vehicles.push_back(other_vehicle);
             }
 
-            std::cout << "=================================" << std::endl;
-            std::cout << "CAR_S: " << car_s << std::endl;
-            std::cout << "CAR_D: " << car_d << std::endl;
-            std::cout << "CAR_X: " << car_x << std::endl;
-            std::cout << "CAR_Y: " << car_y << std::endl;
-            std::cout << "---------------------------------" << std::endl;
-
             double forward_gap = forward_vehicle.s - my_vehicle.s;
             if (forward_gap < 0) forward_gap = LARGE_VALUE;
 
-            Behavior behavior = BehaviorPlanner::update(my_vehicle, forward_gap,
-                                                        other_vehicles);
+            BehaviorPlanner planner(my_vehicle, other_vehicles);
+            Behavior behavior = planner.update(forward_gap);
 
             int n_steps = TIME_STEPS - path_size;
             double time_horizon = n_steps * TIME_INCREMENT;
             my_vehicle.realize_behavior(behavior, forward_vehicle,
                                         time_horizon);
 
-            MapPath next_path = map_waypoints.make_path(
+            MapPath next_path = map_waypoints.generate_path(
                 my_vehicle.get_s_trajectory(), my_vehicle.get_d_trajectory(),
                 TIME_INCREMENT, 0, n_steps);
 

@@ -9,20 +9,19 @@
 
 class BehaviorPlanner {
  private:
-  static double get_gap(const Vehicle& my_vehicle,
-                        const std::vector<Vehicle>& other_vehicles,
-                        const Lane lane, const double direction);
+  Vehicle my_vehicle;
+  std::vector<Vehicle> other_vehicles;
 
-  static double get_keep_lane_cost(const double gap);
-
-  static double get_lane_change_cost(const double forward_gap,
-                                     const double rear_gap,
-                                     const Lane lane);
+  double get_keep_lane_cost(const double gap);
+  double get_lane_change_cost(const Lane lane);
+  double get_gap(const Lane lane, const double direction);
 
  public:
-  static Behavior update(const Vehicle& my_vehicle,
-                         const double forward_gap,
-                         const std::vector<Vehicle>& other_vehicles);
+  BehaviorPlanner(const Vehicle& my_vehicle,
+                  const std::vector<Vehicle>& other_vehicles);
+  virtual ~BehaviorPlanner() {}
+
+  Behavior update(const double forward_gap);
 };
 
 #endif  // BEHAVIOR_PLANNER_H_
