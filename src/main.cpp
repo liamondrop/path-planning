@@ -97,10 +97,7 @@ int main() {
 
           auto sensor_fusion = json_data["sensor_fusion"];
 
-          //*********************************
-          //* Update car object
-          //*********************************
-
+          // Update our vehicle instance
           Vehicle my_vehicle(car_s, car_d, car_speed);
 
           // Return the previous planned path until the path size is less than
@@ -123,7 +120,6 @@ int main() {
             Vehicle forward_vehicle(0, -1, 0);
             double smallest_gap = LARGE_VALUE;
 
-            //
             std::vector<Vehicle> other_vehicles;
             for (auto detected_vehicle : sensor_fusion) {
               const int id = detected_vehicle[0];
@@ -152,34 +148,31 @@ int main() {
             if (forward_gap < 0) forward_gap = LARGE_VALUE;
 
             BehaviorPlanner planner(my_vehicle, other_vehicles);
-            Behavior behavior = planner.update(forward_gap);
+            Behavior behavior = planner.get_behavior(forward_gap);
 
             int n_steps = TIME_STEPS - path_size;
             double time_horizon = n_steps * TIME_INCREMENT;
-            my_vehicle.realize_behavior(behavior, forward_vehicle,
-                                        time_horizon);
+            my_vehicle.realize_behavior(behavior, forward_vehicle, time_horizon);
 
             MapPath next_path = map_waypoints.generate_path(
-                my_vehicle.get_s_trajectory(), my_vehicle.get_d_trajectory(),
+                my_vehicle.get_s_trajectory(),
+                my_vehicle.get_d_trajectory(),
                 TIME_INCREMENT, 0, n_steps);
 
-            planned_path.X.insert(planned_path.X.end(), next_path.X.begin(),
+            planned_path.X.insert(planned_path.X.end(),
+                                  next_path.X.begin(),
                                   next_path.X.end());
-            planned_path.Y.insert(planned_path.Y.end(), next_path.Y.begin(),
+            planned_path.Y.insert(planned_path.Y.end(),
+                                  next_path.Y.begin(),
                                   next_path.Y.end());
           }
 
-          //*********************************
-          //* Send updated path plan to simulator
-          //*********************************
-
+          // Send updated path plan to simulator
           json json_message;
           json_message["next_x"] = planned_path.X;
           json_message["next_y"] = planned_path.Y;
 
           auto msg = "42[\"control\"," + json_message.dump() + "]";
-
-          // this_thread::sleep_for(chrono::milliseconds(1000));
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         }
 

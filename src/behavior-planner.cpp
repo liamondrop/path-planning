@@ -15,7 +15,7 @@ BehaviorPlanner::BehaviorPlanner(const Vehicle& my_vehicle,
                                  const std::vector<Vehicle>& other_vehicles)
     : my_vehicle(my_vehicle), other_vehicles(other_vehicles) {}
 
-Behavior BehaviorPlanner::update(const double forward_gap) {
+Behavior BehaviorPlanner::get_behavior(const double forward_gap) {
   const double straight_cost = get_keep_lane_cost(forward_gap);
   const double right_turn_cost = get_lane_change_cost(my_vehicle.lane_at_right);
   const double left_turn_cost = get_lane_change_cost(my_vehicle.lane_at_left);

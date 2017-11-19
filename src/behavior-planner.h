@@ -21,7 +21,7 @@ class BehaviorPlanner {
                   const std::vector<Vehicle>& other_vehicles);
   virtual ~BehaviorPlanner() {}
 
-  Behavior update(const double forward_gap);
+  Behavior get_behavior(const double forward_gap);
 };
 
 #endif  // BEHAVIOR_PLANNER_H_
