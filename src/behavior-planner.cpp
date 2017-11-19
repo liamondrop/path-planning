@@ -1,9 +1,15 @@
 #include "./behavior-planner.h"
+#include <map>
+#include <string>
 #include <vector>
 
 // Used to determine whether to look for vehicles ahead or vehicles behind
 const double DIRECTION_FORWARD = 1.0;
 const double DIRECTION_REAR = -1.0;
+
+std::map<Lane, const std::string> LaneNames = {
+    {Lane::LEFT, "Left"}, {Lane::MID, "Middle"}, {Lane::RIGHT, "Right"},
+};
 
 BehaviorPlanner::BehaviorPlanner(const Vehicle& my_vehicle,
                                  const std::vector<Vehicle>& other_vehicles)
@@ -41,7 +47,8 @@ double BehaviorPlanner::get_lane_change_cost(const Lane lane) {
   const double rear_gap = get_gap(lane, DIRECTION_REAR);
 
   if (forward_gap < FORWARD_GAP_THRESHOLD || rear_gap < REAR_GAP_THRESHOLD) {
-    std::cout << "... Insufficient space to turn!" << std::endl;
+    std::cout << "... Nearby vehicle in the " << LaneNames[lane] << " lane!"
+              << std::endl;
     return LARGE_VALUE;
   }
 
