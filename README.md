@@ -1,8 +1,11 @@
-# **Path Planning**
+# **Path Planner**
 
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
-### Simulator.
+### Model Documentation
+A detailed description of the Path Planner's control flow can be found in the [MODEL_DOCUMENTATION](./MODEL_DOCUMENTATION.md) file.
+
+### Simulator
 You can download the Term3 Simulator which contains the Path Planning Project from the [releases tab (https://github.com/udacity/self-driving-car-sim/releases).
 
 ### Goals
