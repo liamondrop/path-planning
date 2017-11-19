@@ -49,7 +49,7 @@ MapPath generate_initial_path(Vehicle &my_vehicle,
   std::vector<double> jmt_s = JMT::get_jmt(start_state_s, end_state_s, t);
   std::vector<double> jmt_d = JMT::get_jmt(start_state_d, end_state_d, t);
 
-  my_vehicle.update_states(end_state_s, end_state_d);
+  my_vehicle.set_goal_states(end_state_s, end_state_d);
 
   return map_waypoints.generate_path(jmt_s, jmt_d, TIME_INCREMENT, 0, steps);
 }
@@ -90,10 +90,8 @@ int main() {
           const double car_speed = json_data["speed"];
 
           // Previous path data given to the Planner
-          const std::vector<double> previous_path_x =
-              json_data["previous_path_x"];
-          const std::vector<double> previous_path_y =
-              json_data["previous_path_y"];
+          const std::vector<double> previous_path_x = json_data["previous_path_x"];
+          const std::vector<double> previous_path_y = json_data["previous_path_y"];
           const double end_path_s = json_data["end_path_s"];
           const double end_path_d = json_data["end_path_d"];
 
@@ -105,10 +103,9 @@ int main() {
 
           Vehicle my_vehicle(car_s, car_d, car_speed);
 
-          // Our default is to just give back our previous plan
+          // Return the previous planned path until the path size is less than
+          // the PATH_SIZE_THRESHOLD
           int path_size = previous_path_x.size();
-          int subpath_size = fmin(PATH_SIZE_THRESHOLD, path_size);
-
           MapPath planned_path = {previous_path_x, previous_path_y};
 
           if (is_initial_frame) {
@@ -149,6 +146,8 @@ int main() {
               other_vehicles.push_back(other_vehicle);
             }
 
+            // determine the space between our vehicle and the nearest vehicle
+            // in the current lane, if any
             double forward_gap = forward_vehicle.s - my_vehicle.s;
             if (forward_gap < 0) forward_gap = LARGE_VALUE;
 

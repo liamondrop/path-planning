@@ -13,8 +13,8 @@ Vehicle::Vehicle(const double s, const double d, const double v)
   update_adjacent_lanes();
 }
 
-void Vehicle::update_states(const VehicleState& new_state_s,
-                            const VehicleState& new_state_d) {
+void Vehicle::set_goal_states(const VehicleState& new_state_s,
+                              const VehicleState& new_state_d) {
   state_s = new_state_s;
   state_s.p = fmod(state_s.p, TRACK_LENGTH);
   state_d = new_state_d;
@@ -48,7 +48,7 @@ void Vehicle::realize_behavior(const Behavior& behavior,
   d_trajectory = JMT::get_jmt(state_d, target_state_d, time_horizon);
 
   // save target states
-  update_states(target_state_s, target_state_d);
+  set_goal_states(target_state_s, target_state_d);
 }
 
 Lane Vehicle::convert_d_to_lane(const double d) {

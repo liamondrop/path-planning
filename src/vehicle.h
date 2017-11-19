@@ -38,8 +38,8 @@ class Vehicle {
   Vehicle(const double s, const double d, const double v);
   virtual ~Vehicle() {}
 
-  void update_states(const VehicleState& new_state_s,
-                     const VehicleState& new_state_d);
+  void set_goal_states(const VehicleState& new_state_s,
+                       const VehicleState& new_state_d);
 
   void realize_behavior(const Behavior& behavior,
                         const Vehicle& forward_vehicle,
