@@ -1,5 +1,5 @@
-#ifndef SRC_PATH_CONVERTER_H_
-#define SRC_PATH_CONVERTER_H_
+#ifndef SRC_MAP_WAYPOINTS_H_
+#define SRC_MAP_WAYPOINTS_H_
 
 #include <math.h>
 #include <fstream>
@@ -41,4 +41,4 @@ class MapWaypoints {
                         const int end_index) const;
 };
 
-#endif  // SRC_PATH_CONVERTER_H_
+#endif  // SRC_MAP_WAYPOINTS_H_

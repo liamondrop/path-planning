@@ -16,8 +16,8 @@ MapWaypoints::MapWaypoints(std::string file_path) {
   std::vector<double> X;
   std::vector<double> Y;
   std::vector<double> S;
-  std::vector<double> dX;
-  std::vector<double> dY;
+  std::vector<double> DX;
+  std::vector<double> DY;
 
   double x, y, s, dx, dy;
 
@@ -34,33 +34,41 @@ MapWaypoints::MapWaypoints(std::string file_path) {
     X.push_back(x);
     Y.push_back(y);
     S.push_back(s);
-    dX.push_back(dx);
-    dY.push_back(dy);
+    DX.push_back(dx);
+    DY.push_back(dy);
   }
 
   if (in_file.is_open()) {
     in_file.close();
   }
 
+  // push the first waypoints to the end of the coordinate vectors to ensure a
+  // smooth transition when completing the loop
   X.push_back(X[0]);
   Y.push_back(Y[0]);
   S.push_back(TRACK_LENGTH);
-  dX.push_back(dX[0]);
-  dY.push_back(dY[0]);
+  DX.push_back(DX[0]);
+  DY.push_back(DY[0]);
 
-  // calculate the mappings from s to other values
+  // calculate the mappings from s (distance along the length of the track) to
+  // other x, y, and d values of the waypoints
   x_spline.set_points(S, X);
   y_spline.set_points(S, Y);
-  dx_spline.set_points(S, dX);
-  dy_spline.set_points(S, dY);
+  dx_spline.set_points(S, DX);
+  dy_spline.set_points(S, DY);
 }
 
-Point MapWaypoints::convert_frenet_to_cartesian(
-    const double s, const double d) const {
+Point MapWaypoints::convert_frenet_to_cartesian(const double s,
+                                                const double d) const {
+  // handle when the s value exceeds the length of the track
   const double mod_s = fmod(s, TRACK_LENGTH);
+
+  // Evaluate x, y, dx, and dy at position s.
+  // Then multiply the (x,y) components of the unit d vector by the desired
+  // offset (d) and add to the (x,y) position of the center line to get the
+  // mapping from frenet (s,d) to cartesian (x,y) coordinates
   const double dx = dx_spline(mod_s);
   const double dy = dy_spline(mod_s);
-
   const double x = x_spline(mod_s) + dx * d;
   const double y = y_spline(mod_s) + dy * d;
 
