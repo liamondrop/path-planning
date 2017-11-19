@@ -14,6 +14,10 @@ The path planner defined in this repository undertakes the following steps to sa
 
 ### Map Waypoints
 
+When the path planning module is first started, the [Map Waypoints](src/map-waypoints.h) class is initiated by reading in a [csv file](data/highway_map.csv) consisting of 181 waypoints. These waypoints coarsely define the full path of the track, which is a loop.
+
+Each waypoint is composed of an x, y map position, a Frenet s value (the distance along the direction of the road), and a Frenet d unit normal vector (split up into the x component, and the y component). The d vector has a magnitude of 1 and points perpendicular to the road in the direction of the right-hand side of the road. By fitting a cubic spline to the relationship between the distance traveled (s) and each other waypoint coordinate, we can precisely determine the (x, y) coordinates of the planned trajectories. The library used to fit the splines can be found at [http://kluge.in-chemnitz.de/opensource/spline/](http://kluge.in-chemnitz.de/opensource/spline/).
+
 ### JMT
 
 ### Vehicle
