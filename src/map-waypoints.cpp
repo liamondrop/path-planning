@@ -48,7 +48,7 @@ MapWaypoints::MapWaypoints(std::string file_path) {
   dX.push_back(dX[0]);
   dY.push_back(dY[0]);
 
-  // Uses the loaded information to fit cubic polynomial curves
+  // calculate the mappings from s to other values
   x_spline.set_points(S, X);
   y_spline.set_points(S, Y);
   dx_spline.set_points(S, dX);
