@@ -36,18 +36,17 @@ std::string hasData(std::string s) {
 MapPath generate_initial_path(Vehicle &my_vehicle,
                               const MapWaypoints &map_waypoints) {
   const int steps = 2 * TIME_STEPS;
-  const double t = steps * TIME_INCREMENT;
-  const double target_speed = 20.0;
+  const double time_horizon = steps * TIME_INCREMENT;
   const double target_s = my_vehicle.s + 40.0;
 
   const VehicleState start_state_s = {my_vehicle.s, my_vehicle.v, 0.0};
   const VehicleState start_state_d = {my_vehicle.d, 0.0, 0.0};
 
-  const VehicleState end_state_s = {target_s, target_speed, 0.0};
+  const VehicleState end_state_s = {target_s, SPEED_LIMIT, 0.0};
   const VehicleState end_state_d = {my_vehicle.d, 0.0, 0.0};
 
-  std::vector<double> jmt_s = JMT::get_jmt(start_state_s, end_state_s, t);
-  std::vector<double> jmt_d = JMT::get_jmt(start_state_d, end_state_d, t);
+  std::vector<double> jmt_s = JMT::get_jmt(start_state_s, end_state_s, time_horizon);
+  std::vector<double> jmt_d = JMT::get_jmt(start_state_d, end_state_d, time_horizon);
 
   my_vehicle.set_goal_states(end_state_s, end_state_d);
 
