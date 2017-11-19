@@ -24,9 +24,13 @@ Each waypoint is composed of an `(x,y)` map position, a Frenet `s` value (the di
 
 The [JMT](src/jmt.h) class provides a couple of static methods for calculating a ["Jerk Minimized Trajectory"](http://www.shadmehrlab.org/book/minimum_jerk/minimumjerk.htm), and evaluating the `s` and `d` coordinates of a trajectory at any point in time. We calculate the JMT by defining the starting and ending `VehicleState` and a time horizon. `VehicleState` in this case refers to a vehicle's position, its velocity, and its acceleration in some dimension. When JMTs have been calculated for both the `s` and `d` dimensions, we can find an optimal trajectory that allows us to smoothly travel from on point to the next.
 
+### Behavior Planner
+
+The [Behavior Planner](src/behavior-planner.h) class stores a reference to our vehicle and all of the other vehicles currently in range of our vehicle's sensors. It provides a method to decide whether to turn left, turn right or continue driving straight, based on the location of the vehicles and which decision will allow our vehicle to drive safely as close to the speed limit as possible.
+
 ### Vehicle
 
-### Behavior Planner
+The [Vehicle](src/vehicle.h) class provides methods for storing a vehicle's state, implementing state changes prescribed by the Behavior Planner, as well as utility methods for translating the current lateral offset to a lane and vice versa and storing the lanes to the left and right of the vehicle's current lane.
 
 ## Procedure
 
